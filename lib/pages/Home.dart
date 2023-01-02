@@ -21,7 +21,7 @@ class _HomeState extends State<Home> {
   int selectedIndex = 0;
 
   late RiveAnimationController _btnanimation;
-  // late RiveAnimationController _menuanimation;
+  late RiveAnimationController _menuanimation;
 
   // void togglePlay() {
   //   setState(() {
@@ -51,7 +51,7 @@ class _HomeState extends State<Home> {
   void initState() {
     super.initState();
     _btnanimation = OneShotAnimation('active', autoplay: false);
-    // _menuanimation = OneShotAnimation('idle');
+    _menuanimation = OneShotAnimation('active', autoplay: false);
   }
 
   @override
@@ -82,10 +82,7 @@ class _HomeState extends State<Home> {
                                   width: 50,
                                   child: RiveAnimation.asset(
                                     'assets/menu_button.riv',
-                                    onInit: (_) {
-                                      setState(() {});
-                                    },
-                                    // controllers: [_menuanimation],
+                                    controllers: [_menuanimation],
                                     fit: BoxFit.fill,
                                   ),
                                 ),
