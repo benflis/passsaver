@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "385617781408",
+    "project_id": "passwordsaver-b9dda",
+    "storage_bucket": "passwordsaver-b9dda.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:385617781408:android:522ecc42f865136f781fc5",
+        "android_client_info": {
+          "package_name": "com.example.passwordsaver"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "385617781408-d7u2eo7c5l5lim4bv8c5s60b65vt0v93.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCsNKrex9Yv2ZZtOrdrtIMrhhJwe43tzdE"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "385617781408-d7u2eo7c5l5lim4bv8c5s60b65vt0v93.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

@@ -1,8 +1,12 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/flutter_svg.dart';
+import 'package:flutter/services.dart';
+
 import 'package:passwordsaver/components/emaillist.dart';
 import 'package:passwordsaver/components/generalDial.dart';
 import 'package:passwordsaver/model/data.dart';
+import 'package:passwordsaver/model/item.dart';
+
 import 'package:provider/provider.dart';
 import 'package:rive/rive.dart';
 
@@ -11,14 +15,50 @@ class Home extends StatefulWidget {
   State<Home> createState() => _HomeState();
 }
 
+final _fireStore = FirebaseFirestore.instance;
+
 class _HomeState extends State<Home> {
   int selectedIndex = 0;
+
+  late RiveAnimationController _btnanimation;
+  // late RiveAnimationController _menuanimation;
+
+  // void togglePlay() {
+  //   setState(() {
+  //     _menuanimation.isActive = !_menuanimation.isActive;
+  //   });
+  // }
+
+  // bool get isPlaying => _menuanimation.isActive;
+  // SMIInput<bool>? input;
+  // Artboard? artboard;
+
+  // initializeArtboard() async {
+  //   final data = await rootBundle.load('assets/menu_button.riv');
+  //   final file = RiveFile.import(data);
+  //   final artboard = file.mainArtboard;
+  //   SMIInput<bool>? input;
+
+  //   final controller =
+  //       StateMachineController.fromArtboard(artboard, 'State Machine');
+  //   if (controller != null) {
+  //     artboard.addController(controller);
+  //     input = controller.findInput<bool>('isOpen');
+  //   }
+  // }
+
+  @override
+  void initState() {
+    super.initState();
+    _btnanimation = OneShotAnimation('active', autoplay: false);
+    // _menuanimation = OneShotAnimation('idle');
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       resizeToAvoidBottomInset: false,
-      backgroundColor: Color(0xFF038d83),
+      backgroundColor: Color.fromARGB(255, 139, 62, 153),
       body: SafeArea(
         child: Stack(
           children: [
@@ -35,17 +75,26 @@ class _HomeState extends State<Home> {
                           child: Row(
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
-                              SvgPicture.asset(
-                                'icons/menu-svgrepo-com.svg',
-                                height: 24,
-                                width: 24,
-                                color: Colors.white,
+                              GestureDetector(
+                                // onTap: (() => togglePlay()),
+                                child: Container(
+                                  height: 50,
+                                  width: 50,
+                                  child: RiveAnimation.asset(
+                                    'assets/menu_button.riv',
+                                    onInit: (_) {
+                                      setState(() {});
+                                    },
+                                    // controllers: [_menuanimation],
+                                    fit: BoxFit.fill,
+                                  ),
+                                ),
                               ),
                             ],
                           ),
                         ),
                         SizedBox(
-                          height: 30,
+                          height: 10,
                         ),
                         Padding(
                           padding: EdgeInsets.all(12),
@@ -59,14 +108,15 @@ class _HomeState extends State<Home> {
                               children: [
                                 Icon(Icons.search),
                                 Expanded(
-                                    child: TextField(
-                                  style: TextStyle(
-                                      fontSize: 18, color: Colors.black),
-                                  decoration: InputDecoration(
-                                    border: OutlineInputBorder(
-                                        borderSide: BorderSide.none),
+                                  child: TextField(
+                                    style: TextStyle(
+                                        fontSize: 18, color: Colors.black),
+                                    decoration: InputDecoration(
+                                      border: OutlineInputBorder(
+                                          borderSide: BorderSide.none),
+                                    ),
                                   ),
-                                ))
+                                ),
                               ],
                             ),
                           ),
@@ -82,12 +132,9 @@ class _HomeState extends State<Home> {
               initialChildSize: 0.88,
               maxChildSize: 0.88,
               builder: (context, scrollController) {
-                scrollController.addListener((() {
-                  if (scrollController.initialScrollOffset == 0.1) {}
-                }));
                 return Container(
                   decoration: BoxDecoration(
-                    color: Colors.white,
+                    color: Color.fromARGB(255, 222, 225, 226),
                     borderRadius: BorderRadius.only(
                       topLeft: Radius.circular(25),
                       topRight: Radius.circular(25),
@@ -104,16 +151,9 @@ class _HomeState extends State<Home> {
                           color: Colors.grey,
                         ),
                       ),
-                      Expanded(
-                        child: ListView.builder(
-                          itemCount: Provider.of<Data>(context).getCount(),
-                          controller: scrollController,
-                          itemBuilder: (BuildContext context, int index) =>
-                              EmailsList(
-                            index: index,
-                          ),
-                        ),
-                      ),
+                      StreamOfEmails(
+                        scrollController: scrollController,
+                      )
                     ],
                   ),
                 );
@@ -121,121 +161,218 @@ class _HomeState extends State<Home> {
             ),
             Positioned(
               bottom: 10,
-              left: 30,
-              right: 30,
-              child: GestureDetector(
-                onTap: () {
-                  showGeneralDialog(
-                    context: context,
-                    barrierDismissible: true,
-                    barrierLabel: 'Add Entry',
-                    pageBuilder: (context, _, __) {
-                      return GeneralDial();
+              left: 40,
+              right: 10,
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  GestureDetector(
+                    onTap: () {
+                      _btnanimation.isActive = true;
+                      Future.delayed(
+                        Duration(milliseconds: 1000),
+                        () {
+                          showGeneralDialog(
+                            context: context,
+                            barrierDismissible: true,
+                            barrierLabel: 'Add Entry',
+                            pageBuilder: (context, _, __) {
+                              return GeneralDial();
+                            },
+                          );
+                        },
+                      );
                     },
-                  );
-                },
-                child: Container(
-                  alignment: Alignment.center,
-                  height: 60,
-                  width: MediaQuery.of(context).size.width,
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(20),
-                    color: Colors.black,
-                    // boxShadow: [
-                    //   BoxShadow(
-                    //     color: Colors.white70,
-                    //     offset: Offset(-5, -5),
-                    //     blurRadius: 15,
-                    //     spreadRadius: 1,
-                    //   ),
-                    //   BoxShadow(
-                    //     color: Colors.white10,
-                    //     offset: Offset(5, 5),
-                    //     blurRadius: 15,
-                    //     spreadRadius: 1,
-                    //   ),
-                    // ],
-                  ),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Icon(
-                        Icons.add,
-                        color: Colors.white,
-                        size: 40,
-                      ),
-                      SizedBox(
-                        width: 10,
-                      ),
-                      Text(
-                        "Add new entry",
-                        style: TextStyle(
-                            color: Colors.white,
-                            fontSize: 25,
-                            fontWeight: FontWeight.w900),
-                      ),
-                    ],
-                  ),
 
-                  // child: Row(
-                  //   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                  //   children: [
-                  //     GestureDetector(
-                  //       onTap: () {
-                  //         setState(() {
-                  //           selectedIndex = 0;
-                  //         });
-                  //       },
-                  //       child: BottomNavItem(
-                  //         pic: 'icons/home-svgrepo-com.svg',
-                  //         selectedIndex: selectedIndex,
-                  //         index: 0,
-                  //       ),
-                  //     ),
-                  //     GestureDetector(
-                  //       onTap: () {
-                  //         setState(() {
-                  //           selectedIndex = 1;
-                  //         });
-                  //       },
-                  //       child: BottomNavItem(
-                  //         pic: 'icons/home-svgrepo-com.svg',
-                  //         selectedIndex: selectedIndex,
-                  //         index: 1,
-                  //       ),
-                  //     ),
-                  //     GestureDetector(
-                  //       onTap: () {
-                  //         setState(() {
-                  //           selectedIndex = 2;
-                  //         });
-                  //       },
-                  //       child: BottomNavItem(
-                  //         pic: 'icons/home-svgrepo-com.svg',
-                  //         selectedIndex: selectedIndex,
-                  //         index: 2,
-                  //       ),
-                  //     ),
-                  //     GestureDetector(
-                  //       onTap: () {
-                  //         setState(() {
-                  //           selectedIndex = 3;
-                  //         });
-                  //       },
-                  //       child: BottomNavItem(
-                  //         pic: 'icons/home-svgrepo-com.svg',
-                  //         selectedIndex: selectedIndex,
-                  //         index: 3,
-                  //       ),
-                  //     ),
-                  //   ],
-                  // ),
-                ),
+                    child: Container(
+                      height: 64,
+                      width: 236,
+                      child: Stack(
+                        children: [
+                          RiveAnimation.asset(
+                            'assets/button.riv',
+                            controllers: [_btnanimation],
+                          ),
+                          Positioned.fill(
+                            top: 8,
+                            child: Center(
+                              child: Text(
+                                'Add New Entry',
+                                style: TextStyle(color: Colors.black),
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    // child: Container(
+                    //   alignment: Alignment.center,
+                    //   height: 60,
+                    //   width: MediaQuery.of(context).size.width,
+                    //   decoration: BoxDecoration(
+                    //     borderRadius: BorderRadius.circular(20),
+                    //     color: Colors.black,
+                    //     // boxShadow: [
+                    //     //   BoxShadow(
+                    //     //     color: Colors.white70,
+                    //     //     offset: Offset(-5, -5),
+                    //     //     blurRadius: 15,
+                    //     //     spreadRadius: 1,
+                    //     //   ),
+                    //     //   BoxShadow(
+                    //     //     color: Colors.white10,
+                    //     //     offset: Offset(5, 5),
+                    //     //     blurRadius: 15,
+                    //     //     spreadRadius: 1,
+                    //     //   ),
+                    //     // ],
+                    //   ),
+                    //   child: Row(
+                    //     mainAxisAlignment: MainAxisAlignment.center,
+                    //     children: [
+                    //       Icon(
+                    //         Icons.add,
+                    //         color: Colors.white,
+                    //         size: 40,
+                    //       ),
+                    //       SizedBox(
+                    //         width: 10,
+                    //       ),
+                    //       Text(
+                    //         "Add new entry",
+                    //         style: TextStyle(
+                    //             color: Colors.white,
+                    //             fontSize: 25,
+                    //             fontWeight: FontWeight.w900),
+                    //       ),
+                    //     ],
+                    //   ),
+
+                    //   // child: Row(
+                    //   //   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                    //   //   children: [
+                    //   //     GestureDetector(
+                    //   //       onTap: () {
+                    //   //         setState(() {
+                    //   //           selectedIndex = 0;
+                    //   //         });
+                    //   //       },
+                    //   //       child: BottomNavItem(
+                    //   //         pic: 'icons/home-svgrepo-com.svg',
+                    //   //         selectedIndex: selectedIndex,
+                    //   //         index: 0,
+                    //   //       ),
+                    //   //     ),
+                    //   //     GestureDetector(
+                    //   //       onTap: () {
+                    //   //         setState(() {
+                    //   //           selectedIndex = 1;
+                    //   //         });
+                    //   //       },
+                    //   //       child: BottomNavItem(
+                    //   //         pic: 'icons/home-svgrepo-com.svg',
+                    //   //         selectedIndex: selectedIndex,
+                    //   //         index: 1,
+                    //   //       ),
+                    //   //     ),
+                    //   //     GestureDetector(
+                    //   //       onTap: () {
+                    //   //         setState(() {
+                    //   //           selectedIndex = 2;
+                    //   //         });
+                    //   //       },
+                    //   //       child: BottomNavItem(
+                    //   //         pic: 'icons/home-svgrepo-com.svg',
+                    //   //         selectedIndex: selectedIndex,
+                    //   //         index: 2,
+                    //   //       ),
+                    //   //     ),
+                    //   //     GestureDetector(
+                    //   //       onTap: () {
+                    //   //         setState(() {
+                    //   //           selectedIndex = 3;
+                    //   //         });
+                    //   //       },
+                    //   //       child: BottomNavItem(
+                    //   //         pic: 'icons/home-svgrepo-com.svg',
+                    //   //         selectedIndex: selectedIndex,
+                    //   //         index: 3,
+                    //   //       ),
+                    //   //     ),
+                    //   //   ],
+                    //   // ),
+                    // ),
+                  ),
+                  SizedBox(
+                    width: 20,
+                  ),
+                  IconButton(
+                    icon: Provider.of<Data>(context).visible == true
+                        ? Icon(
+                            Icons.visibility,
+                            color: Colors.black,
+                          )
+                        : Icon(
+                            Icons.visibility_off,
+                            color: Colors.black,
+                          ),
+                    onPressed: () {
+                      Provider.of<Data>(context, listen: false)
+                          .changeVisibility();
+                    },
+                  ),
+                ],
               ),
             )
           ],
         ),
       ),
+    );
+  }
+}
+
+class StreamOfEmails extends StatelessWidget {
+  ScrollController scrollController;
+  StreamOfEmails({required this.scrollController});
+  @override
+  Widget build(BuildContext context) {
+    return StreamBuilder<QuerySnapshot>(
+      builder: (context, snapshot) {
+        if (!snapshot.hasData) {
+          return Center(
+            child: CircularProgressIndicator(),
+          );
+        }
+        final messages = snapshot.data!.docs;
+        final List<ItemEmail> list = [];
+        for (var M in messages) {
+          final messageEmail = M['Email'];
+          final messagePassword = M['Password'];
+          final messagePicture = M['Picture'];
+
+          list.add(
+            ItemEmail(
+                email: messageEmail,
+                password: messagePassword,
+                picture: messagePicture),
+          );
+        }
+        Provider.of<Data>(context).addEmails(list);
+
+        return Expanded(
+          child: ListView.builder(
+            controller: scrollController,
+            itemCount: Provider.of<Data>(context).getCount(),
+            itemBuilder: (BuildContext context, int index) => EmailsList(
+              index: index,
+            ),
+          ),
+        );
+      },
+      stream: _fireStore
+          .collection('Information')
+          .orderBy('Time', descending: true)
+          .snapshots(),
     );
   }
 }

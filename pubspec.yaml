@@ -40,6 +40,8 @@ dependencies:
   flutter_svg: ^1.1.6
   provider: ^6.0.5
   rive: ^0.10.0
+  firebase_core: ^2.4.1
+  cloud_firestore: ^4.3.1
  
 
 dev_dependencies:

@@ -34,6 +34,11 @@ class Data extends ChangeNotifier {
     notifyListeners();
   }
 
+  void addEmails(List<ItemEmail> list) {
+    emaillist = list;
+    // notifyListeners();
+  }
+
   void changeVisibility() {
     visible = !visible;
     notifyListeners();

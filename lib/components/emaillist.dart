@@ -12,7 +12,11 @@ class EmailsList extends StatelessWidget {
       padding: const EdgeInsets.symmetric(vertical: 5, horizontal: 10),
       child: ListTile(
         title: Text(Provider.of<Data>(context).emaillist[index].email),
-        subtitle: Text(Provider.of<Data>(context).emaillist[index].password),
+        subtitle: Provider.of<Data>(context).visible == true
+            ? Text(
+                Provider.of<Data>(context).emaillist[index].password,
+              )
+            : null,
         leading: SvgPicture.asset(
           Provider.of<Data>(context).emaillist[index].picture,
           height: 40,

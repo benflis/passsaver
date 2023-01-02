@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:passwordsaver/model/data.dart';
@@ -22,14 +23,14 @@ class _GeneralDialState extends State<GeneralDial> {
   String? password;
   String? picture;
   String dropDownItem = 'icons/yahoo-svgrepo-com.svg';
-
+  final _fireStore = FirebaseFirestore.instance;
   @override
   Widget build(BuildContext context) {
     picture = dropDownItem;
     return Container(
       height: 650,
       margin: EdgeInsets.symmetric(horizontal: 20, vertical: 50),
-      padding: EdgeInsets.symmetric(vertical: 20, horizontal: 20),
+      padding: EdgeInsets.only(top: 30, right: 20, left: 20),
       decoration: BoxDecoration(
           color: Colors.white, borderRadius: BorderRadius.circular(25)),
       child: Scaffold(
@@ -151,6 +152,8 @@ class _GeneralDialState extends State<GeneralDial> {
                           child: Container(
                             height: 70,
                             child: DropdownButtonFormField(
+                              elevation: 16,
+                              iconSize: 20,
                               decoration: InputDecoration(
                                 border: OutlineInputBorder(
                                     borderSide: BorderSide.none),
@@ -235,6 +238,15 @@ class _GeneralDialState extends State<GeneralDial> {
                             ),
                           ),
                           onPressed: () {
+                            // add data to the cloud firestore
+                            _fireStore.collection('Information').add({
+                              'Email': email,
+                              'Password': password,
+                              'Picture': picture,
+                              'Time': Timestamp.now(),
+                            });
+
+                            // add data locally
                             Provider.of<Data>(context, listen: false)
                                 .setEmail(email);
                             Provider.of<Data>(context, listen: false)
