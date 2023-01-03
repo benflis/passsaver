@@ -18,10 +18,14 @@ class Home extends StatefulWidget {
 final _fireStore = FirebaseFirestore.instance;
 
 class _HomeState extends State<Home> {
+  GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
   int selectedIndex = 0;
 
   late RiveAnimationController _btnanimation;
-  late RiveAnimationController _menuanimation;
+
+  Artboard? _riveArtboard;
+  SMIInput<bool>? isOpen;
+  StateMachineController? _controller;
 
   // void togglePlay() {
   //   setState(() {
@@ -51,14 +55,40 @@ class _HomeState extends State<Home> {
   void initState() {
     super.initState();
     _btnanimation = OneShotAnimation('active', autoplay: false);
-    _menuanimation = OneShotAnimation('active', autoplay: false);
+
+    rootBundle.load('assets/menu_button.riv').then(
+      (data) async {
+        final file = RiveFile.import(data);
+        final riveArtboard = file.mainArtboard;
+        if (riveArtboard != null) {
+          var controller = StateMachineController.fromArtboard(
+              riveArtboard, 'State Machine');
+
+          _controller = controller;
+
+          if (_controller != null) {
+            riveArtboard.addController(_controller!);
+            isOpen = controller!.findInput('isOpen');
+            _controller!.isActive = false;
+            isOpen!.value = true;
+          }
+        }
+        setState(
+          () {
+            _riveArtboard = riveArtboard;
+          },
+        );
+      },
+    );
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      key: _scaffoldKey,
       resizeToAvoidBottomInset: false,
       backgroundColor: Color.fromARGB(255, 139, 62, 153),
+      drawer: Drawer(),
       body: SafeArea(
         child: Stack(
           children: [
@@ -76,15 +106,25 @@ class _HomeState extends State<Home> {
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
                               GestureDetector(
-                                // onTap: (() => togglePlay()),
+                                onTap: () {
+                                  setState(
+                                    () {
+                                      _scaffoldKey.currentState!.openDrawer();
+
+                                      isOpen!.value
+                                          ? isOpen!.value = false
+                                          : isOpen!.value = true;
+                                    },
+                                  );
+                                },
                                 child: Container(
                                   height: 50,
                                   width: 50,
-                                  child: RiveAnimation.asset(
-                                    'assets/menu_button.riv',
-                                    controllers: [_menuanimation],
-                                    fit: BoxFit.fill,
-                                  ),
+                                  child: _riveArtboard == null
+                                      ? const SizedBox()
+                                      : Rive(
+                                          artboard: _riveArtboard!,
+                                        ),
                                 ),
                               ),
                             ],
