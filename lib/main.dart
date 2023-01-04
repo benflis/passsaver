@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:passwordsaver/model/data.dart';
 import 'package:passwordsaver/pages/Home.dart';
 import 'package:provider/provider.dart';
@@ -10,6 +11,8 @@ void main() async {
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
+  SystemChrome.setEnabledSystemUIOverlays([]);
+
   runApp(MyApp());
 }
 
