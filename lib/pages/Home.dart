@@ -5,12 +5,14 @@ import 'package:flutter_svg/flutter_svg.dart';
 
 import 'package:passwordsaver/components/emaillist.dart';
 import 'package:passwordsaver/components/generalDial.dart';
-import 'package:passwordsaver/main.dart';
+
 import 'package:passwordsaver/model/data.dart';
 import 'package:passwordsaver/model/item.dart';
 
 import 'package:provider/provider.dart';
 import 'package:rive/rive.dart';
+
+int selectedIndex = 0;
 
 class Home extends StatefulWidget {
   @override
@@ -21,7 +23,6 @@ final _fireStore = FirebaseFirestore.instance;
 
 class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
   GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
-  int selectedIndex = 0;
 
   late RiveAnimationController _btnanimation;
 
@@ -31,6 +32,10 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
 
   late AnimationController controller;
   late Animation<Offset> animation;
+
+  ScrollController scroller = ScrollController();
+
+  bool active = false;
 
   @override
   void initState() {
@@ -75,7 +80,6 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
 
   @override
   void dispose() {
-    // TODO: implement dispose
     super.dispose();
     controller.dispose();
   }
@@ -186,10 +190,29 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
                             child: Container(
                               height: 100,
                               child: ListView.builder(
-                                itemCount: 3,
+                                controller: scroller,
+                                itemCount: 4,
                                 scrollDirection: Axis.horizontal,
                                 itemBuilder: (context, index) => Category(
                                   index: index,
+                                  active: active,
+                                  selectedindex: selectedIndex,
+                                  onTap: () {
+                                    setState(
+                                      () {
+                                        selectedIndex = index;
+                                        active = true;
+
+                                        if (selectedIndex == 3) {
+                                          active = false;
+                                          scroller.animateTo(0,
+                                              duration:
+                                                  Duration(milliseconds: 600),
+                                              curve: Curves.fastOutSlowIn);
+                                        }
+                                      },
+                                    );
+                                  },
                                 ),
                               ),
                             ),
@@ -406,36 +429,49 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
 }
 
 class Category extends StatelessWidget {
-  Category({required this.index});
+  Category(
+      {required this.index,
+      required this.selectedindex,
+      required this.onTap,
+      required this.active});
 
   int index;
+  int selectedindex;
+  void Function()? onTap;
+  bool active;
 
   List items = [
     ['GitHub', 'icons/github-svgrepo-com.svg'],
     ['Yahoo', 'icons/yahoo-svgrepo-com.svg'],
     ['Gmail', 'icons/new-logo-gmail-svgrepo-com.svg'],
+    ['Reset', 'icons/reset-svgrepo-com.svg']
   ];
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 20.0),
-      child: Container(
-        width: 150,
-        padding: EdgeInsets.all(20),
-        decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.circular(25),
-        ),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            SvgPicture.asset(
-              items[index][1],
-              height: 42,
-              width: 42,
-            ),
-            Text(items[index][0])
-          ],
+      padding: const EdgeInsets.symmetric(horizontal: 10.0),
+      child: GestureDetector(
+        onTap: onTap,
+        child: Container(
+          width: 150,
+          padding: EdgeInsets.all(20),
+          decoration: BoxDecoration(
+            color: selectedindex == index && active
+                ? Color(0xFF4e8dff)
+                : Colors.white,
+            borderRadius: BorderRadius.circular(25),
+          ),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              SvgPicture.asset(
+                items[index][1],
+                height: 42,
+                width: 42,
+              ),
+              Text(items[index][0])
+            ],
+          ),
         ),
       ),
     );
