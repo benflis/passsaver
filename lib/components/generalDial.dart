@@ -3,13 +3,16 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:passwordsaver/model/data.dart';
 import 'package:provider/provider.dart';
+import 'package:rive/rive.dart';
 
 class GeneralDial extends StatefulWidget {
   @override
   State<GeneralDial> createState() => _GeneralDialState();
 }
 
-class _GeneralDialState extends State<GeneralDial> {
+class _GeneralDialState extends State<GeneralDial>
+    with SingleTickerProviderStateMixin {
+  late RiveAnimationController _btnanimation;
   List<String> items = [
     'icons/Yahoo.svg',
     'icons/Gmail.svg',
@@ -17,8 +20,7 @@ class _GeneralDialState extends State<GeneralDial> {
     'icons/Spotify.svg',
     'icons/Facebook.svg',
   ];
-  FocusNode _focus = FocusNode();
-  FocusNode _focus2 = FocusNode();
+
   TextEditingController emailController = TextEditingController();
   TextEditingController passController = TextEditingController();
 
@@ -29,6 +31,13 @@ class _GeneralDialState extends State<GeneralDial> {
   final _fireStore = FirebaseFirestore.instance;
 
   @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    _btnanimation = OneShotAnimation('active', autoplay: false);
+  }
+
+  @override
   Widget build(BuildContext context) {
     picture = dropDownItem;
     return Container(
@@ -36,7 +45,8 @@ class _GeneralDialState extends State<GeneralDial> {
       margin: EdgeInsets.symmetric(horizontal: 20, vertical: 50),
       padding: EdgeInsets.only(top: 30, right: 20, left: 20),
       decoration: BoxDecoration(
-          color: Colors.white, borderRadius: BorderRadius.circular(25)),
+          color: Color.fromARGB(255, 206, 213, 216),
+          borderRadius: BorderRadius.circular(25)),
       child: Scaffold(
         backgroundColor: Colors.transparent,
         body: SingleChildScrollView(
@@ -84,73 +94,102 @@ class _GeneralDialState extends State<GeneralDial> {
                       ],
                     ),
                   ),
-                  SizedBox(
-                    height: 30,
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.all(12.0),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.end,
-                      children: [
-                        ElevatedButton(
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.end,
+                    children: [
+                      Padding(
+                        padding: const EdgeInsets.all(12.0),
+                        child: ElevatedButton(
                             style: ElevatedButton.styleFrom(
-                                backgroundColor: Colors.red,
-                                shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(24))),
-                            onPressed: () {
-                              emailController.clear();
-                              passController.clear();
-                            },
-                            child: SvgPicture.asset(
-                              'icons/Close.svg',
-                              height: 20,
-                              width: 20,
-                              color: Colors.white,
-                            )),
-                        SizedBox(
-                          width: 50,
-                        ),
-                        ElevatedButton(
-                            style: ElevatedButton.styleFrom(
+                              backgroundColor: Colors.red,
                               shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(28),
+                                borderRadius: BorderRadius.circular(24),
                               ),
                             ),
                             onPressed: () {
-                              // add data to the cloud firestore
-                              _fireStore.collection('Information').add({
-                                'Email': email,
-                                'Password': password,
-                                'Picture': picture,
-                                'Time': Timestamp.now(),
-                              });
-
-                              // add data locally
-                              Provider.of<Data>(context, listen: false)
-                                  .setEmail(email);
-                              Provider.of<Data>(context, listen: false)
-                                  .setPass(password);
-                              Provider.of<Data>(context, listen: false)
-                                  .setPic(picture);
-                              Provider.of<Data>(context, listen: false)
-                                  .addEmail(
-                                      Provider.of<Data>(context, listen: false)
-                                          .email!,
-                                      Provider.of<Data>(context, listen: false)
-                                          .password!,
-                                      Provider.of<Data>(context, listen: false)
-                                          .picture!);
                               emailController.clear();
                               passController.clear();
-                              Navigator.pop(context);
                             },
                             child: SvgPicture.asset(
-                              'icons/arrow_right.svg',
+                              'icons/Reset.svg',
                               height: 20,
                               width: 20,
                               color: Colors.white,
                             )),
-                      ],
+                      ),
+                    ],
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.all(12.0),
+                    child: GestureDetector(
+                      onTap: () {
+                        //play animation
+                        _btnanimation.isActive = true;
+
+                        // add data to the cloud firestore
+                        _fireStore.collection('Information').add({
+                          'Email': email,
+                          'Password': password,
+                          'Picture': picture,
+                          'Time': Timestamp.now(),
+                        });
+
+                        // add data locally
+
+                        Provider.of<Data>(context, listen: false)
+                            .setEmail(email);
+                        Provider.of<Data>(context, listen: false)
+                            .setPass(password);
+                        Provider.of<Data>(context, listen: false)
+                            .setPic(picture);
+                        Provider.of<Data>(context, listen: false).addEmail(
+                            Provider.of<Data>(context, listen: false).email!,
+                            Provider.of<Data>(context, listen: false).password!,
+                            Provider.of<Data>(context, listen: false).picture!);
+
+                        emailController.clear();
+                        passController.clear();
+                        Future.delayed(
+                          Duration(milliseconds: 900),
+                          () {
+                            Navigator.pop(context);
+                          },
+                        );
+                      },
+                      child: Container(
+                        height: 64,
+                        width: 236,
+                        child: Stack(
+                          children: [
+                            RiveAnimation.asset(
+                              'assets/submit.riv',
+                              controllers: [_btnanimation],
+                            ),
+                            Positioned.fill(
+                                top: 4,
+                                child: Row(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    Text(
+                                      'Submit',
+                                      style: TextStyle(
+                                          fontWeight: FontWeight.bold,
+                                          fontSize: 20),
+                                    ),
+                                    SizedBox(
+                                      width: 6,
+                                    ),
+                                    SvgPicture.asset(
+                                      'icons/arrow_right.svg',
+                                      color: Colors.blue,
+                                      height: 20,
+                                      width: 20,
+                                    ),
+                                  ],
+                                ))
+                          ],
+                        ),
+                      ),
                     ),
                   ),
                 ],

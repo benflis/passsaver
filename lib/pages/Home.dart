@@ -254,7 +254,7 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
                       onTap: () {
                         _btnanimation.isActive = true;
                         Future.delayed(
-                          Duration(milliseconds: 1000),
+                          Duration(milliseconds: 900),
                           () {
                             showGeneralDialog(
                               context: context,
