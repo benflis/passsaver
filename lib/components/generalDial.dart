@@ -11,19 +11,23 @@ class GeneralDial extends StatefulWidget {
 
 class _GeneralDialState extends State<GeneralDial> {
   List<String> items = [
-    'icons/yahoo-svgrepo-com.svg',
-    'icons/new-logo-gmail-svgrepo-com.svg',
-    'icons/github-svgrepo-com.svg',
+    'icons/Yahoo.svg',
+    'icons/Gmail.svg',
+    'icons/Github.svg',
+    'icons/Spotify.svg',
+    'icons/Facebook.svg',
   ];
-
+  FocusNode _focus = FocusNode();
+  FocusNode _focus2 = FocusNode();
   TextEditingController emailController = TextEditingController();
   TextEditingController passController = TextEditingController();
 
   String? email;
   String? password;
   String? picture;
-  String dropDownItem = 'icons/yahoo-svgrepo-com.svg';
+  String dropDownItem = 'icons/Yahoo.svg';
   final _fireStore = FirebaseFirestore.instance;
+
   @override
   Widget build(BuildContext context) {
     picture = dropDownItem;
@@ -68,133 +72,15 @@ class _GeneralDialState extends State<GeneralDial> {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text(
-                          'Email',
-                          style: TextStyle(color: Colors.black54),
+                        Email(),
+                        SizedBox(
+                          height: 20,
                         ),
-                        Padding(
-                          padding: const EdgeInsets.all(8.0),
-                          child: TextFormField(
-                            controller: emailController,
-                            onChanged: (value) {
-                              email = value;
-                            },
-                            keyboardType: TextInputType.emailAddress,
-                            style: TextStyle(fontSize: 28),
-                            decoration: InputDecoration(
-                              border: OutlineInputBorder(
-                                  borderSide: BorderSide.none),
-                              prefixIcon: Padding(
-                                padding: const EdgeInsets.only(right: 20.0),
-                                child: SvgPicture.asset(
-                                  'icons/mail-full-svgrepo-com.svg',
-                                  height: 38,
-                                  width: 38,
-                                ),
-                              ),
-                            ),
-                          ),
+                        Password(),
+                        SizedBox(
+                          height: 20,
                         ),
-                        Text(
-                          'Password',
-                          style: TextStyle(color: Colors.black54),
-                        ),
-                        Padding(
-                          padding: const EdgeInsets.all(8.0),
-                          child: TextFormField(
-                            controller: passController,
-                            onChanged: (value) {
-                              password = value;
-                            },
-                            style: TextStyle(fontSize: 28),
-                            obscureText:
-                                Provider.of<Data>(context).visible == false
-                                    ? true
-                                    : false,
-                            decoration: InputDecoration(
-                                border: OutlineInputBorder(
-                                    borderSide: BorderSide.none),
-                                prefixIcon: Padding(
-                                  padding: const EdgeInsets.only(right: 20.0),
-                                  child: SvgPicture.asset(
-                                    'icons/user-password-svgrepo-com.svg',
-                                    height: 38,
-                                    width: 38,
-                                  ),
-                                ),
-                                suffixIcon: Padding(
-                                  padding: const EdgeInsets.all(8.0),
-                                  child: IconButton(
-                                    icon: Provider.of<Data>(context).visible ==
-                                            true
-                                        ? Icon(
-                                            Icons.visibility,
-                                            color: Colors.black,
-                                          )
-                                        : Icon(
-                                            Icons.visibility_off,
-                                            color: Colors.black,
-                                          ),
-                                    onPressed: () {
-                                      Provider.of<Data>(context, listen: false)
-                                          .changeVisibility();
-                                    },
-                                  ),
-                                )),
-                          ),
-                        ),
-                        Text(
-                          'Company',
-                          style: TextStyle(color: Colors.black54),
-                        ),
-                        Padding(
-                          padding: const EdgeInsets.all(8.0),
-                          child: Container(
-                            height: 70,
-                            child: DropdownButtonFormField(
-                              elevation: 16,
-                              iconSize: 20,
-                              decoration: InputDecoration(
-                                border: OutlineInputBorder(
-                                    borderSide: BorderSide.none),
-                              ),
-                              value: dropDownItem,
-                              items: items.map<DropdownMenuItem<String>>(
-                                  (String value) {
-                                return DropdownMenuItem(
-                                  value: value,
-                                  child: SvgPicture.asset(
-                                    value,
-                                    height: 38,
-                                    width: 38,
-                                  ),
-                                );
-                              }).toList(),
-                              onChanged: (value) {
-                                setState(() {
-                                  dropDownItem = value!;
-                                  picture = value;
-                                });
-                              },
-                            ),
-                          ),
-                          // child: TextFormField(
-                          //   keyboardType: TextInputType.emailAddress,
-                          //   style: TextStyle(fontSize: 28),
-                          //   decoration: InputDecoration(
-                          //     border:
-                          //         OutlineInputBorder(borderSide: BorderSide.none),
-                          //     prefixIcon: Padding(
-                          //       padding: const EdgeInsets.only(right: 20.0),
-                          //       child: SvgPicture.asset(
-                          //         'icons/email-files-letter-svgrepo-com.svg',
-                          //         height: 38,
-                          //         width: 38,
-                          //       ),
-                          //     ),
-                          //   ),
-                          // ),
-                        ),
+                        Company(),
                       ],
                     ),
                   ),
@@ -207,87 +93,202 @@ class _GeneralDialState extends State<GeneralDial> {
                       mainAxisAlignment: MainAxisAlignment.end,
                       children: [
                         ElevatedButton(
-                          style: ElevatedButton.styleFrom(
-                              backgroundColor: Colors.red,
-                              shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.only(
-                                      topRight: Radius.circular(24),
-                                      bottomLeft: Radius.circular(24),
-                                      bottomRight: Radius.circular(24)))),
-                          onPressed: () {
-                            emailController.clear();
-                            passController.clear();
-                          },
-                          child: Icon(
-                            Icons.close,
-                            color: Colors.white,
-                            size: 28,
-                          ),
-                        ),
+                            style: ElevatedButton.styleFrom(
+                                backgroundColor: Colors.red,
+                                shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(24))),
+                            onPressed: () {
+                              emailController.clear();
+                              passController.clear();
+                            },
+                            child: SvgPicture.asset(
+                              'icons/Close.svg',
+                              height: 20,
+                              width: 20,
+                              color: Colors.white,
+                            )),
                         SizedBox(
                           width: 50,
                         ),
                         ElevatedButton(
-                          style: ElevatedButton.styleFrom(
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.only(
-                                topRight: Radius.circular(24),
-                                bottomLeft: Radius.circular(24),
-                                bottomRight: Radius.circular(24),
+                            style: ElevatedButton.styleFrom(
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(28),
                               ),
                             ),
-                          ),
-                          onPressed: () {
-                            // add data to the cloud firestore
-                            _fireStore.collection('Information').add({
-                              'Email': email,
-                              'Password': password,
-                              'Picture': picture,
-                              'Time': Timestamp.now(),
-                            });
+                            onPressed: () {
+                              // add data to the cloud firestore
+                              _fireStore.collection('Information').add({
+                                'Email': email,
+                                'Password': password,
+                                'Picture': picture,
+                                'Time': Timestamp.now(),
+                              });
 
-                            // add data locally
-                            Provider.of<Data>(context, listen: false)
-                                .setEmail(email);
-                            Provider.of<Data>(context, listen: false)
-                                .setPass(password);
-                            Provider.of<Data>(context, listen: false)
-                                .setPic(picture);
-                            Provider.of<Data>(context, listen: false).addEmail(
-                                Provider.of<Data>(context, listen: false)
-                                    .email!,
-                                Provider.of<Data>(context, listen: false)
-                                    .password!,
-                                Provider.of<Data>(context, listen: false)
-                                    .picture!);
-                            emailController.clear();
-                            passController.clear();
-                            Navigator.pop(context);
-                          },
-                          child: Icon(
-                            Icons.arrow_right_alt_outlined,
-                            size: 28,
-                            color: Colors.white,
-                          ),
-                        ),
+                              // add data locally
+                              Provider.of<Data>(context, listen: false)
+                                  .setEmail(email);
+                              Provider.of<Data>(context, listen: false)
+                                  .setPass(password);
+                              Provider.of<Data>(context, listen: false)
+                                  .setPic(picture);
+                              Provider.of<Data>(context, listen: false)
+                                  .addEmail(
+                                      Provider.of<Data>(context, listen: false)
+                                          .email!,
+                                      Provider.of<Data>(context, listen: false)
+                                          .password!,
+                                      Provider.of<Data>(context, listen: false)
+                                          .picture!);
+                              emailController.clear();
+                              passController.clear();
+                              Navigator.pop(context);
+                            },
+                            child: SvgPicture.asset(
+                              'icons/arrow_right.svg',
+                              height: 20,
+                              width: 20,
+                              color: Colors.white,
+                            )),
                       ],
                     ),
                   ),
                 ],
               ),
-              Positioned(
-                top: 0,
-                right: 0,
-                child: GestureDetector(
-                    onTap: () {
-                      Navigator.pop(context);
-                    },
-                    child: CircleAvatar(radius: 18, child: Icon(Icons.close))),
-              )
+              CloseButton()
             ],
           ),
         ),
       ),
+    );
+  }
+
+///////////////////Created Widgets///////////////////
+
+  Widget Email() {
+    return Padding(
+      padding: const EdgeInsets.all(8.0),
+      child: TextFormField(
+        controller: emailController,
+        onChanged: (value) {
+          email = value;
+        },
+        keyboardType: TextInputType.emailAddress,
+        style: TextStyle(fontSize: 18),
+        decoration: InputDecoration(
+          prefixIcon: Padding(
+            padding: const EdgeInsets.only(right: 20.0, left: 10),
+            child: SvgPicture.asset(
+              'icons/mail.svg',
+              height: 20,
+              width: 20,
+            ),
+          ),
+          label: Text('Email'),
+          floatingLabelBehavior: FloatingLabelBehavior.always,
+          border: OutlineInputBorder(
+            borderSide: BorderSide(color: Colors.grey, width: 2),
+            borderRadius: BorderRadius.circular(12),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget Password() {
+    return Padding(
+      padding: const EdgeInsets.all(8.0),
+      child: TextFormField(
+        controller: passController,
+        onChanged: (value) {
+          password = value;
+        },
+        style: TextStyle(fontSize: 18),
+        obscureText: Provider.of<Data>(context).visible == false ? true : false,
+        decoration: InputDecoration(
+            labelStyle: TextStyle(),
+            prefixIcon: Padding(
+              padding: const EdgeInsets.only(right: 20.0, left: 10),
+              child: SvgPicture.asset(
+                'icons/passwordLock.svg',
+                height: 28,
+                width: 28,
+              ),
+            ),
+            label: Text('Password'),
+            floatingLabelBehavior: FloatingLabelBehavior.always,
+            border: OutlineInputBorder(
+                borderSide: BorderSide(color: Colors.grey, width: 2),
+                borderRadius: BorderRadius.circular(12)),
+            suffixIcon: Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: IconButton(
+                icon: Provider.of<Data>(context).visible == true
+                    ? Icon(
+                        Icons.visibility,
+                        color: Colors.black,
+                      )
+                    : Icon(
+                        Icons.visibility_off,
+                        color: Colors.black,
+                      ),
+                onPressed: () {
+                  Provider.of<Data>(context, listen: false).changeVisibility();
+                },
+              ),
+            )),
+      ),
+    );
+  }
+
+  Widget Company() {
+    return Padding(
+      padding: const EdgeInsets.all(8.0),
+      child: Container(
+        height: 70,
+        child: DropdownButtonFormField(
+          elevation: 16,
+          iconSize: 20,
+          decoration: InputDecoration(
+              border: OutlineInputBorder(
+                  borderSide: BorderSide(width: 2, color: Colors.black),
+                  borderRadius: BorderRadius.circular(12)),
+              label: Text('Company'),
+              floatingLabelBehavior: FloatingLabelBehavior.always),
+          value: dropDownItem,
+          items: items.map<DropdownMenuItem<String>>((String value) {
+            return DropdownMenuItem(
+              value: value,
+              child: SvgPicture.asset(
+                value,
+                height: 25,
+                width: 25,
+              ),
+            );
+          }).toList(),
+          onChanged: (value) {
+            setState(() {
+              dropDownItem = value!;
+              picture = value;
+            });
+          },
+        ),
+      ),
+    );
+  }
+}
+
+class CloseButton extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return Positioned(
+      top: 0,
+      right: 0,
+      child: GestureDetector(
+          onTap: () {
+            Navigator.pop(context);
+          },
+          child: CircleAvatar(radius: 18, child: Icon(Icons.close))),
     );
   }
 }

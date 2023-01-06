@@ -23,6 +23,7 @@ class Data extends ChangeNotifier {
 
   bool visible = false;
   List<ItemEmail> emaillist = [];
+  List<ItemEmail> searchlist = [];
 
   int getCount() {
     return emaillist.length;
@@ -31,12 +32,17 @@ class Data extends ChangeNotifier {
   void addEmail(String email, String password, String picture) {
     emaillist
         .add(ItemEmail(email: email, password: password, picture: picture));
+
+    notifyListeners();
+  }
+
+  void setData(data) {
+    searchlist = data;
     notifyListeners();
   }
 
   void addEmails(List<ItemEmail> list) {
     emaillist = list;
-    // notifyListeners();
   }
 
   void changeVisibility() {

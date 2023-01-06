@@ -13,6 +13,7 @@ import 'package:provider/provider.dart';
 import 'package:rive/rive.dart';
 
 int selectedIndex = 0;
+TextEditingController Search = TextEditingController();
 
 class Home extends StatefulWidget {
   @override
@@ -36,6 +37,14 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
   ScrollController scroller = ScrollController();
 
   bool active = false;
+  List items = [
+    ['GitHub', 'icons/Github.svg'],
+    ['Yahoo', 'icons/Yahoo.svg'],
+    ['Gmail', 'icons/Gmail.svg'],
+    ['Spotify', 'icons/Spotify.svg'],
+    ['Facebook', 'icons/Facebook.svg'],
+    ['Reset', 'icons/Reset.svg'],
+  ];
 
   @override
   void initState() {
@@ -160,30 +169,8 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
                           SizedBox(
                             height: 10,
                           ),
-                          Padding(
-                            padding: EdgeInsets.all(12),
-                            child: Container(
-                              padding: EdgeInsets.all(8),
-                              decoration: BoxDecoration(
-                                color: Color(0xFF0c8cff),
-                                borderRadius: BorderRadius.circular(25),
-                              ),
-                              child: Row(
-                                children: [
-                                  Icon(Icons.search),
-                                  Expanded(
-                                    child: TextField(
-                                      style: TextStyle(
-                                          fontSize: 18, color: Colors.black),
-                                      decoration: InputDecoration(
-                                        border: OutlineInputBorder(
-                                            borderSide: BorderSide.none),
-                                      ),
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
+                          SearchBox(
+                            onChanged: (value) {},
                           ),
                           Padding(
                             padding: EdgeInsets.all(8),
@@ -191,10 +178,11 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
                               height: 100,
                               child: ListView.builder(
                                 controller: scroller,
-                                itemCount: 4,
+                                itemCount: items.length,
                                 scrollDirection: Axis.horizontal,
                                 itemBuilder: (context, index) => Category(
                                   index: index,
+                                  items: items,
                                   active: active,
                                   selectedindex: selectedIndex,
                                   onTap: () {
@@ -203,7 +191,7 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
                                         selectedIndex = index;
                                         active = true;
 
-                                        if (selectedIndex == 3) {
+                                        if (selectedIndex == items.length - 1) {
                                           active = false;
                                           scroller.animateTo(0,
                                               duration:
@@ -428,24 +416,70 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
   }
 }
 
+class SearchBox extends StatelessWidget {
+  void Function(String)? onChanged;
+  SearchBox({required this.onChanged});
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: EdgeInsets.all(12),
+      child: Container(
+        padding: EdgeInsets.symmetric(vertical: 19, horizontal: 18),
+        decoration: BoxDecoration(
+          color: Color(0xFFFFFFFF),
+          borderRadius: BorderRadius.circular(25),
+        ),
+        child: Row(
+          children: [
+            Expanded(
+              child: TextField(
+                onChanged: onChanged,
+                controller: Search,
+                style: TextStyle(color: Colors.black),
+                decoration: InputDecoration(
+                  border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(10),
+                      borderSide: BorderSide.none),
+                  prefixIcon: Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: SvgPicture.asset(
+                      'icons/Search.svg',
+                      height: 18,
+                      width: 18,
+                    ),
+                  ),
+                  filled: true,
+                  fillColor: Color.fromARGB(255, 216, 218, 221),
+                ),
+              ),
+            ),
+            TextButton(
+                onPressed: () {},
+                child: Text(
+                  'Close',
+                  style: TextStyle(color: Color(0xFF959eab)),
+                )),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
 class Category extends StatelessWidget {
   Category(
       {required this.index,
       required this.selectedindex,
       required this.onTap,
-      required this.active});
+      required this.active,
+      required this.items});
 
   int index;
   int selectedindex;
   void Function()? onTap;
   bool active;
 
-  List items = [
-    ['GitHub', 'icons/github-svgrepo-com.svg'],
-    ['Yahoo', 'icons/yahoo-svgrepo-com.svg'],
-    ['Gmail', 'icons/new-logo-gmail-svgrepo-com.svg'],
-    ['Reset', 'icons/reset-svgrepo-com.svg']
-  ];
+  List items;
   @override
   Widget build(BuildContext context) {
     return Padding(
@@ -453,7 +487,7 @@ class Category extends StatelessWidget {
       child: GestureDetector(
         onTap: onTap,
         child: Container(
-          width: 150,
+          width: 130,
           padding: EdgeInsets.all(20),
           decoration: BoxDecoration(
             color: selectedindex == index && active
