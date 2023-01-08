@@ -47,24 +47,22 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
   ];
 
   void search(String query) {
-    // if (query.isEmpty) {
-    //   setState(() {
-    //     result = Provider.of<Data>(context, listen: false).emaillist;
-    //   });
-    // } else {
-    //   setState(() {
-    //     result = Provider.of<Data>(context, listen: false)
-    //         .emaillist
-    //         .where((element) {
-    //       return element.email.contains(query);
-    //     }).toList();
-    //   });
-    // }
+    var result;
+    if (query.isEmpty) {
+      setState(() {
+        result = Provider.of<Data>(context, listen: false).emaillist;
+      });
+    } else {
+      setState(() {
+        result = Provider.of<Data>(context, listen: false)
+            .emaillist
+            .where((element) {
+          return element.email.contains(query);
+        }).toList();
+      });
+    }
 
-    Provider.of<Data>(context, listen: false).emaillist.forEach((element) {
-      if (element.email.contains(query))
-        Provider.of<Data>(context, listen: false).addSearch(element);
-    });
+    Provider.of<Data>(context, listen: false).addSearch(result);
   }
 
   @override
@@ -282,7 +280,6 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
                           },
                         );
                       },
-
                       child: Container(
                         height: 64,
                         width: 236,
@@ -304,103 +301,6 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
                           ],
                         ),
                       ),
-                      // child: Container(
-                      //   alignment: Alignment.center,
-                      //   height: 60,
-                      //   width: MediaQuery.of(context).size.width,
-                      //   decoration: BoxDecoration(
-                      //     borderRadius: BorderRadius.circular(20),
-                      //     color: Colors.black,
-                      //     // boxShadow: [
-                      //     //   BoxShadow(
-                      //     //     color: Colors.white70,
-                      //     //     offset: Offset(-5, -5),
-                      //     //     blurRadius: 15,
-                      //     //     spreadRadius: 1,
-                      //     //   ),
-                      //     //   BoxShadow(
-                      //     //     color: Colors.white10,
-                      //     //     offset: Offset(5, 5),
-                      //     //     blurRadius: 15,
-                      //     //     spreadRadius: 1,
-                      //     //   ),
-                      //     // ],
-                      //   ),
-                      //   child: Row(
-                      //     mainAxisAlignment: MainAxisAlignment.center,
-                      //     children: [
-                      //       Icon(
-                      //         Icons.add,
-                      //         color: Colors.white,
-                      //         size: 40,
-                      //       ),
-                      //       SizedBox(
-                      //         width: 10,
-                      //       ),
-                      //       Text(
-                      //         "Add new entry",
-                      //         style: TextStyle(
-                      //             color: Colors.white,
-                      //             fontSize: 25,
-                      //             fontWeight: FontWeight.w900),
-                      //       ),
-                      //     ],
-                      //   ),
-
-                      //   // child: Row(
-                      //   //   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                      //   //   children: [
-                      //   //     GestureDetector(
-                      //   //       onTap: () {
-                      //   //         setState(() {
-                      //   //           selectedIndex = 0;
-                      //   //         });
-                      //   //       },
-                      //   //       child: BottomNavItem(
-                      //   //         pic: 'icons/home-svgrepo-com.svg',
-                      //   //         selectedIndex: selectedIndex,
-                      //   //         index: 0,
-                      //   //       ),
-                      //   //     ),
-                      //   //     GestureDetector(
-                      //   //       onTap: () {
-                      //   //         setState(() {
-                      //   //           selectedIndex = 1;
-                      //   //         });
-                      //   //       },
-                      //   //       child: BottomNavItem(
-                      //   //         pic: 'icons/home-svgrepo-com.svg',
-                      //   //         selectedIndex: selectedIndex,
-                      //   //         index: 1,
-                      //   //       ),
-                      //   //     ),
-                      //   //     GestureDetector(
-                      //   //       onTap: () {
-                      //   //         setState(() {
-                      //   //           selectedIndex = 2;
-                      //   //         });
-                      //   //       },
-                      //   //       child: BottomNavItem(
-                      //   //         pic: 'icons/home-svgrepo-com.svg',
-                      //   //         selectedIndex: selectedIndex,
-                      //   //         index: 2,
-                      //   //       ),
-                      //   //     ),
-                      //   //     GestureDetector(
-                      //   //       onTap: () {
-                      //   //         setState(() {
-                      //   //           selectedIndex = 3;
-                      //   //         });
-                      //   //       },
-                      //   //       child: BottomNavItem(
-                      //   //         pic: 'icons/home-svgrepo-com.svg',
-                      //   //         selectedIndex: selectedIndex,
-                      //   //         index: 3,
-                      //   //       ),
-                      //   //     ),
-                      //   //   ],
-                      //   // ),
-                      // ),
                     ),
                     SizedBox(
                       width: 20,
@@ -578,8 +478,7 @@ class StreamOfEmails extends StatelessWidget {
         Provider.of<Data>(context).addEmails(list);
 
         return Expanded(
-          child: Search.text.isNotEmpty ||
-                  Provider.of<Data>(context).filteredList != 0
+          child: Search.text.isEmpty
               ? ListView.builder(
                   controller: scrollController,
                   itemCount: Provider.of<Data>(context).getCountOriginalList(),

@@ -21,6 +21,8 @@ class _GeneralDialState extends State<GeneralDial>
     'icons/Facebook.svg',
   ];
 
+  GlobalKey<FormState> _formKey = GlobalKey<FormState>();
+
   TextEditingController emailController = TextEditingController();
   TextEditingController passController = TextEditingController();
 
@@ -79,6 +81,7 @@ class _GeneralDialState extends State<GeneralDial>
                     height: 30,
                   ),
                   Form(
+                    key: _formKey,
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
@@ -125,32 +128,37 @@ class _GeneralDialState extends State<GeneralDial>
                       onTap: () {
                         //play animation
                         _btnanimation.isActive = true;
+                        if (_formKey.currentState!.validate()) {
+                          // add data to the cloud firestore
+                          _fireStore.collection('Information').add({
+                            'Email': email,
+                            'Password': password,
+                            'Picture': picture,
+                            'Time': Timestamp.now(),
+                          });
 
-                        // add data to the cloud firestore
-                        _fireStore.collection('Information').add({
-                          'Email': email,
-                          'Password': password,
-                          'Picture': picture,
-                          'Time': Timestamp.now(),
-                        });
+                          // add data locally
 
-                        // add data locally
+                          Provider.of<Data>(context, listen: false)
+                              .setEmail(email);
+                          Provider.of<Data>(context, listen: false)
+                              .setPass(password);
+                          Provider.of<Data>(context, listen: false)
+                              .setPic(picture);
+                          Provider.of<Data>(context, listen: false).addEmail(
+                              Provider.of<Data>(context, listen: false).email!,
+                              Provider.of<Data>(context, listen: false)
+                                  .password!,
+                              Provider.of<Data>(context, listen: false)
+                                  .picture!);
 
-                        Provider.of<Data>(context, listen: false)
-                            .setEmail(email);
-                        Provider.of<Data>(context, listen: false)
-                            .setPass(password);
-                        Provider.of<Data>(context, listen: false)
-                            .setPic(picture);
-                        Provider.of<Data>(context, listen: false).addEmail(
-                            Provider.of<Data>(context, listen: false).email!,
-                            Provider.of<Data>(context, listen: false).password!,
-                            Provider.of<Data>(context, listen: false).picture!);
+                          emailController.clear();
+                          passController.clear();
 
-                        emailController.clear();
-                        passController.clear();
-
-                        Navigator.pop(context);
+                          Navigator.pop(context);
+                        } else {
+                          print('ERROR');
+                        }
                       },
                       child: Container(
                         height: 64,
@@ -204,6 +212,13 @@ class _GeneralDialState extends State<GeneralDial>
     return Padding(
       padding: const EdgeInsets.all(8.0),
       child: TextFormField(
+        validator: (value) {
+          if (value!.isEmpty) {
+            return "";
+          }
+          return null;
+        },
+        onSaved: (newValue) {},
         controller: emailController,
         onChanged: (value) {
           email = value;
@@ -234,6 +249,13 @@ class _GeneralDialState extends State<GeneralDial>
     return Padding(
       padding: const EdgeInsets.all(8.0),
       child: TextFormField(
+        validator: (value) {
+          if (value!.isEmpty) {
+            return "";
+          }
+          return null;
+        },
+        onSaved: (newValue) {},
         controller: passController,
         onChanged: (value) {
           password = value;
@@ -282,6 +304,13 @@ class _GeneralDialState extends State<GeneralDial>
       child: Container(
         height: 70,
         child: DropdownButtonFormField(
+          validator: (value) {
+            if (value!.isEmpty) {
+              return "";
+            }
+            return null;
+          },
+          onSaved: (newValue) {},
           elevation: 16,
           iconSize: 20,
           decoration: InputDecoration(

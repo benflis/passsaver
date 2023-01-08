@@ -45,7 +45,8 @@ class Data extends ChangeNotifier {
   }
 
   void addSearch(final data) {
-    filteredList.add(data);
+    filteredList = data;
+    notifyListeners();
   }
 
   void addEmails(List<ItemEmail> list) {
