@@ -149,12 +149,8 @@ class _GeneralDialState extends State<GeneralDial>
 
                         emailController.clear();
                         passController.clear();
-                        Future.delayed(
-                          Duration(milliseconds: 900),
-                          () {
-                            Navigator.pop(context);
-                          },
-                        );
+
+                        Navigator.pop(context);
                       },
                       child: Container(
                         height: 64,
@@ -194,7 +190,7 @@ class _GeneralDialState extends State<GeneralDial>
                   ),
                 ],
               ),
-              CloseButton()
+              CloseButton(),
             ],
           ),
         ),

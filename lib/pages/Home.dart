@@ -46,9 +46,31 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
     ['Reset', 'icons/Reset.svg'],
   ];
 
+  void search(String query) {
+    // if (query.isEmpty) {
+    //   setState(() {
+    //     result = Provider.of<Data>(context, listen: false).emaillist;
+    //   });
+    // } else {
+    //   setState(() {
+    //     result = Provider.of<Data>(context, listen: false)
+    //         .emaillist
+    //         .where((element) {
+    //       return element.email.contains(query);
+    //     }).toList();
+    //   });
+    // }
+
+    Provider.of<Data>(context, listen: false).emaillist.forEach((element) {
+      if (element.email.contains(query))
+        Provider.of<Data>(context, listen: false).addSearch(element);
+    });
+  }
+
   @override
   void initState() {
     super.initState();
+
     _btnanimation = OneShotAnimation('active', autoplay: false);
 
     controller = AnimationController(
@@ -170,7 +192,7 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
                             height: 10,
                           ),
                           SearchBox(
-                            onChanged: (value) {},
+                            onChanged: ((p0) => search(p0)),
                           ),
                           Padding(
                             padding: EdgeInsets.all(8),
@@ -254,16 +276,9 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
                       onTap: () {
                         _btnanimation.isActive = true;
                         Future.delayed(
-                          Duration(milliseconds: 900),
+                          Duration(milliseconds: 760),
                           () {
-                            showGeneralDialog(
-                              context: context,
-                              barrierDismissible: true,
-                              barrierLabel: 'Add Entry',
-                              pageBuilder: (context, _, __) {
-                                return GeneralDial();
-                              },
-                            );
+                            customGeneralGialog(context);
                           },
                         );
                       },
@@ -414,6 +429,28 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
       ),
     );
   }
+
+  Future<Object?> customGeneralGialog(BuildContext context) {
+    return showGeneralDialog(
+      context: context,
+      barrierDismissible: true,
+      transitionDuration: Duration(milliseconds: 400),
+      transitionBuilder: (_, animation, __, child) {
+        Tween<Offset> tween;
+        tween = Tween(begin: const Offset(0, -1), end: Offset.zero);
+        return SlideTransition(
+          position: tween.animate(
+            CurvedAnimation(parent: animation, curve: Curves.easeInOut),
+          ),
+          child: child,
+        );
+      },
+      barrierLabel: 'Add Entry',
+      pageBuilder: (context, animation, __) {
+        return GeneralDial();
+      },
+    );
+  }
 }
 
 class SearchBox extends StatelessWidget {
@@ -541,13 +578,24 @@ class StreamOfEmails extends StatelessWidget {
         Provider.of<Data>(context).addEmails(list);
 
         return Expanded(
-          child: ListView.builder(
-            controller: scrollController,
-            itemCount: Provider.of<Data>(context).getCount(),
-            itemBuilder: (BuildContext context, int index) => EmailsList(
-              index: index,
-            ),
-          ),
+          child: Search.text.isNotEmpty ||
+                  Provider.of<Data>(context).filteredList != 0
+              ? ListView.builder(
+                  controller: scrollController,
+                  itemCount: Provider.of<Data>(context).getCountOriginalList(),
+                  itemBuilder: (BuildContext context, int index) => EmailsList(
+                    origOrFill: true,
+                    index: index,
+                  ),
+                )
+              : ListView.builder(
+                  controller: scrollController,
+                  itemCount: Provider.of<Data>(context).getCountFilteredList(),
+                  itemBuilder: (BuildContext context, int index) => EmailsList(
+                    origOrFill: false,
+                    index: index,
+                  ),
+                ),
         );
       },
       stream: _fireStore

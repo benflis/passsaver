@@ -5,7 +5,8 @@ import 'package:provider/provider.dart';
 
 class EmailsList extends StatelessWidget {
   int index;
-  EmailsList({required this.index});
+  bool origOrFill;
+  EmailsList({required this.index, required this.origOrFill});
   @override
   Widget build(BuildContext context) {
     return Padding(
@@ -13,17 +14,29 @@ class EmailsList extends StatelessWidget {
       child: Column(
         children: [
           ListTile(
-            title: Text(Provider.of<Data>(context).emaillist[index].email),
+            title: origOrFill
+                ? Text(Provider.of<Data>(context).emaillist[index].email)
+                : Text(Provider.of<Data>(context).filteredList[index].email),
             subtitle: Provider.of<Data>(context).visible == true
-                ? Text(
-                    Provider.of<Data>(context).emaillist[index].password,
-                  )
+                ? (origOrFill
+                    ? Text(
+                        Provider.of<Data>(context).emaillist[index].password,
+                      )
+                    : Text(
+                        Provider.of<Data>(context).filteredList[index].password,
+                      ))
                 : null,
-            leading: SvgPicture.asset(
-              Provider.of<Data>(context).emaillist[index].picture,
-              height: 40,
-              width: 40,
-            ),
+            leading: origOrFill
+                ? SvgPicture.asset(
+                    Provider.of<Data>(context).emaillist[index].picture,
+                    height: 40,
+                    width: 40,
+                  )
+                : SvgPicture.asset(
+                    Provider.of<Data>(context).filteredList[index].picture,
+                    height: 40,
+                    width: 40,
+                  ),
           ),
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 60.0),
