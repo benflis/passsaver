@@ -42,6 +42,7 @@ dependencies:
   rive: ^0.10.0
   firebase_core: ^2.4.1
   cloud_firestore: ^4.3.1
+  flutter_slidable: ^2.0.0
  
 
 dev_dependencies:

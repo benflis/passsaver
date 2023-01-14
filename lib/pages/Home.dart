@@ -46,20 +46,88 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
     ['Reset', 'icons/Reset.svg'],
   ];
 
+  void selectedCategory() {
+    var result;
+    switch (selectedIndex) {
+      case 0:
+        {
+          result = Provider.of<Data>(context, listen: false)
+              .emaillist
+              .where((element) {
+            return element.picture.contains('Github');
+          }).toList();
+
+          Provider.of<Data>(context, listen: false).addSearch(result);
+          print(Provider.of<Data>(context, listen: false).filteredList.length);
+        }
+        break;
+
+      case 1:
+        {
+          result = Provider.of<Data>(context, listen: false)
+              .emaillist
+              .where((element) {
+            return element.picture.contains('Yahoo');
+          }).toList();
+
+          Provider.of<Data>(context, listen: false).addSearch(result);
+          print(Provider.of<Data>(context, listen: false).filteredList.length);
+        }
+        break;
+      case 2:
+        {
+          result = Provider.of<Data>(context, listen: false)
+              .emaillist
+              .where((element) {
+            return element.picture.contains('Gmail');
+          }).toList();
+
+          Provider.of<Data>(context, listen: false).addSearch(result);
+        }
+        break;
+      case 3:
+        {
+          result = Provider.of<Data>(context, listen: false)
+              .emaillist
+              .where((element) {
+            return element.picture.contains('Spotify');
+          }).toList();
+
+          Provider.of<Data>(context, listen: false).addSearch(result);
+        }
+        break;
+      case 4:
+        {
+          result = Provider.of<Data>(context, listen: false)
+              .emaillist
+              .where((element) {
+            return element.picture.contains('Facebook');
+          }).toList();
+
+          Provider.of<Data>(context, listen: false).addSearch(result);
+        }
+        break;
+      case 5:
+        {
+          setState(() {
+            active = false;
+          });
+
+          Provider.of<Data>(context, listen: false).emptySearch();
+        }
+        break;
+    }
+  }
+
   void search(String query) {
     var result;
     if (query.isEmpty) {
-      setState(() {
-        result = Provider.of<Data>(context, listen: false).emaillist;
-      });
+      result = Provider.of<Data>(context, listen: false).emaillist;
     } else {
-      setState(() {
-        result = Provider.of<Data>(context, listen: false)
-            .emaillist
-            .where((element) {
-          return element.email.contains(query);
-        }).toList();
-      });
+      result =
+          Provider.of<Data>(context, listen: false).emaillist.where((element) {
+        return element.email.contains(query);
+      }).toList();
     }
 
     Provider.of<Data>(context, listen: false).addSearch(result);
@@ -129,7 +197,6 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
           }
         });
       },
-      drawer: Drawer(),
       body: SafeArea(
         child: Container(
           decoration: BoxDecoration(
@@ -145,47 +212,50 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
                     child: Container(
                       child: Column(
                         children: [
-                          Padding(
-                            padding: const EdgeInsets.symmetric(
-                                vertical: 10, horizontal: 20),
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                Hero(
-                                  tag: 'open',
-                                  child: GestureDetector(
-                                    onTap: () {
-                                      setState(
-                                        () {
-                                          if (isOpen!.value == true) {
-                                            isOpen!.value = false;
-                                            _scaffoldKey.currentState!
-                                                .openDrawer();
-                                          } else {
-                                            isOpen!.value = true;
-                                            _scaffoldKey.currentState!
-                                                .closeDrawer();
-                                          }
-                                        },
-                                      );
-                                    },
-                                    child: SlideTransition(
-                                      position: animation,
-                                      child: Container(
-                                        height: 50,
-                                        width: 50,
-                                        child: _riveArtboard == null
-                                            ? const SizedBox()
-                                            : Rive(
-                                                artboard: _riveArtboard!,
-                                              ),
-                                      ),
-                                    ),
-                                  ),
-                                ),
-                              ],
-                            ),
+                          SizedBox(
+                            height: 90,
                           ),
+                          // Padding(
+                          //   padding: const EdgeInsets.symmetric(
+                          //       vertical: 10, horizontal: 20),
+                          //   child: Row(
+                          //     mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          //     children: [
+                          //       Hero(
+                          //         tag: 'open',
+                          //         child: GestureDetector(
+                          //           onTap: () {
+                          //             setState(
+                          //               () {
+                          //                 if (isOpen!.value == true) {
+                          //                   isOpen!.value = false;
+                          //                   _scaffoldKey.currentState!
+                          //                       .openDrawer();
+                          //                 } else {
+                          //                   isOpen!.value = true;
+                          //                   _scaffoldKey.currentState!
+                          //                       .closeDrawer();
+                          //                 }
+                          //               },
+                          //             );
+                          //           },
+                          //           child: SlideTransition(
+                          //             position: animation,
+                          //             child: Container(
+                          //               height: 50,
+                          //               width: 50,
+                          //               child: _riveArtboard == null
+                          //                   ? const SizedBox()
+                          //                   : Rive(
+                          //                       artboard: _riveArtboard!,
+                          //                     ),
+                          //             ),
+                          //           ),
+                          //         ),
+                          //       ),
+                          //     ],
+                          //   ),
+                          // ),
                           SizedBox(
                             height: 10,
                           ),
@@ -218,6 +288,7 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
                                                   Duration(milliseconds: 600),
                                               curve: Curves.fastOutSlowIn);
                                         }
+                                        selectedCategory();
                                       },
                                     );
                                   },
@@ -237,6 +308,8 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
                 maxChildSize: 0.88,
                 builder: (context, scrollController) {
                   return Container(
+                    padding: EdgeInsets.only(bottom: 80),
+                    margin: EdgeInsets.only(top: 20),
                     decoration: BoxDecoration(
                       color: Color.fromARGB(255, 222, 225, 226),
                       borderRadius: BorderRadius.only(
@@ -257,6 +330,7 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
                         ),
                         StreamOfEmails(
                           scrollController: scrollController,
+                          active: active,
                         )
                       ],
                     ),
@@ -265,62 +339,39 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
               ),
               Positioned(
                 bottom: 10,
-                left: 40,
-                right: 10,
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    GestureDetector(
-                      onTap: () {
-                        _btnanimation.isActive = true;
-                        Future.delayed(
-                          Duration(milliseconds: 760),
-                          () {
-                            customGeneralGialog(context);
-                          },
-                        );
+                left: 0,
+                right: 0,
+                child: GestureDetector(
+                  onTap: () {
+                    _btnanimation.isActive = true;
+                    Future.delayed(
+                      Duration(milliseconds: 760),
+                      () {
+                        customGeneralGialog(context);
                       },
-                      child: Container(
-                        height: 64,
-                        width: 236,
-                        child: Stack(
-                          children: [
-                            RiveAnimation.asset(
-                              'assets/button.riv',
-                              controllers: [_btnanimation],
-                            ),
-                            Positioned.fill(
-                              top: 8,
-                              child: Center(
-                                child: Text(
-                                  'Add New Entry',
-                                  style: TextStyle(color: Colors.black),
-                                ),
-                              ),
-                            ),
-                          ],
+                    );
+                  },
+                  child: Container(
+                    height: 64,
+                    width: 236,
+                    child: Stack(
+                      children: [
+                        RiveAnimation.asset(
+                          'assets/button.riv',
+                          controllers: [_btnanimation],
                         ),
-                      ),
-                    ),
-                    SizedBox(
-                      width: 20,
-                    ),
-                    IconButton(
-                      icon: Provider.of<Data>(context).visible == true
-                          ? Icon(
-                              Icons.visibility,
-                              color: Colors.black,
-                            )
-                          : Icon(
-                              Icons.visibility_off,
-                              color: Colors.black,
+                        Positioned.fill(
+                          top: 8,
+                          child: Center(
+                            child: Text(
+                              'Add New Entry',
+                              style: TextStyle(color: Colors.black),
                             ),
-                      onPressed: () {
-                        Provider.of<Data>(context, listen: false)
-                            .changeVisibility();
-                      },
+                          ),
+                        ),
+                      ],
                     ),
-                  ],
+                  ),
                 ),
               )
             ],
@@ -393,7 +444,7 @@ class SearchBox extends StatelessWidget {
             TextButton(
                 onPressed: () {},
                 child: Text(
-                  'Close',
+                  'X',
                   style: TextStyle(color: Color(0xFF959eab)),
                 )),
           ],
@@ -451,7 +502,8 @@ class Category extends StatelessWidget {
 
 class StreamOfEmails extends StatelessWidget {
   ScrollController scrollController;
-  StreamOfEmails({required this.scrollController});
+  bool active;
+  StreamOfEmails({required this.scrollController, required this.active});
   @override
   Widget build(BuildContext context) {
     return StreamBuilder<QuerySnapshot>(
@@ -478,7 +530,9 @@ class StreamOfEmails extends StatelessWidget {
         Provider.of<Data>(context).addEmails(list);
 
         return Expanded(
-          child: Search.text.isEmpty
+          child: (Search.text.isEmpty &&
+                  Provider.of<Data>(context).filteredList.length == 0 &&
+                  active == false)
               ? ListView.builder(
                   controller: scrollController,
                   itemCount: Provider.of<Data>(context).getCountOriginalList(),

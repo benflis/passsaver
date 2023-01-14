@@ -34,7 +34,6 @@ class _GeneralDialState extends State<GeneralDial>
 
   @override
   void initState() {
-    // TODO: implement initState
     super.initState();
     _btnanimation = OneShotAnimation('active', autoplay: false);
   }
@@ -42,167 +41,172 @@ class _GeneralDialState extends State<GeneralDial>
   @override
   Widget build(BuildContext context) {
     picture = dropDownItem;
-    return Container(
-      height: 650,
-      margin: EdgeInsets.symmetric(horizontal: 20, vertical: 50),
-      padding: EdgeInsets.only(top: 30, right: 20, left: 20),
-      decoration: BoxDecoration(
-          color: Color.fromARGB(255, 206, 213, 216),
-          borderRadius: BorderRadius.circular(25)),
-      child: Scaffold(
-        backgroundColor: Colors.transparent,
-        body: SingleChildScrollView(
-          child: Stack(
-            clipBehavior: Clip.none,
-            children: [
-              Column(
+    return Stack(
+      children: [
+        Container(
+          height: 650,
+          margin: EdgeInsets.symmetric(horizontal: 20, vertical: 50),
+          padding: EdgeInsets.only(top: 30, right: 20, left: 20),
+          decoration: BoxDecoration(
+              color: Color.fromARGB(255, 206, 213, 216),
+              borderRadius: BorderRadius.circular(25)),
+          child: Scaffold(
+            backgroundColor: Colors.transparent,
+            body: SingleChildScrollView(
+              child: Stack(
+                clipBehavior: Clip.none,
                 children: [
-                  Text(
-                    "Information",
-                    style: TextStyle(
-                      fontSize: 32,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.blueGrey,
-                    ),
-                  ),
-                  SizedBox(
-                    height: 30,
-                  ),
-                  Padding(
-                    padding: EdgeInsets.symmetric(horizontal: 20),
-                    child: Text(
-                      'add your email, password, and the domain the email is associated with.',
-                      style: TextStyle(
-                        color: Colors.grey,
-                      ),
-                    ),
-                  ),
-                  SizedBox(
-                    height: 30,
-                  ),
-                  Form(
-                    key: _formKey,
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Email(),
-                        SizedBox(
-                          height: 20,
-                        ),
-                        Password(),
-                        SizedBox(
-                          height: 20,
-                        ),
-                        Company(),
-                      ],
-                    ),
-                  ),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.end,
+                  Column(
                     children: [
-                      Padding(
-                        padding: const EdgeInsets.all(12.0),
-                        child: ElevatedButton(
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor: Colors.red,
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(24),
-                              ),
-                            ),
-                            onPressed: () {
-                              emailController.clear();
-                              passController.clear();
-                            },
-                            child: SvgPicture.asset(
-                              'icons/Reset.svg',
-                              height: 20,
-                              width: 20,
-                              color: Colors.white,
-                            )),
+                      Text(
+                        "Information",
+                        style: TextStyle(
+                          fontSize: 32,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.blueGrey,
+                        ),
                       ),
-                    ],
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.all(12.0),
-                    child: GestureDetector(
-                      onTap: () {
-                        //play animation
-                        _btnanimation.isActive = true;
-                        if (_formKey.currentState!.validate()) {
-                          // add data to the cloud firestore
-                          _fireStore.collection('Information').add({
-                            'Email': email,
-                            'Password': password,
-                            'Picture': picture,
-                            'Time': Timestamp.now(),
-                          });
-
-                          // add data locally
-
-                          Provider.of<Data>(context, listen: false)
-                              .setEmail(email);
-                          Provider.of<Data>(context, listen: false)
-                              .setPass(password);
-                          Provider.of<Data>(context, listen: false)
-                              .setPic(picture);
-                          Provider.of<Data>(context, listen: false).addEmail(
-                              Provider.of<Data>(context, listen: false).email!,
-                              Provider.of<Data>(context, listen: false)
-                                  .password!,
-                              Provider.of<Data>(context, listen: false)
-                                  .picture!);
-
-                          emailController.clear();
-                          passController.clear();
-
-                          Navigator.pop(context);
-                        } else {
-                          print('ERROR');
-                        }
-                      },
-                      child: Container(
-                        height: 64,
-                        width: 236,
-                        child: Stack(
+                      SizedBox(
+                        height: 30,
+                      ),
+                      Padding(
+                        padding: EdgeInsets.symmetric(horizontal: 20),
+                        child: Text(
+                          'add your email, password, and the domain the email is associated with.',
+                          style: TextStyle(
+                            color: Colors.grey,
+                          ),
+                        ),
+                      ),
+                      SizedBox(
+                        height: 30,
+                      ),
+                      Form(
+                        key: _formKey,
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            RiveAnimation.asset(
-                              'assets/submit.riv',
-                              controllers: [_btnanimation],
+                            Email(),
+                            SizedBox(
+                              height: 20,
                             ),
-                            Positioned.fill(
-                                top: 4,
-                                child: Row(
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  children: [
-                                    Text(
-                                      'Submit',
-                                      style: TextStyle(
-                                          fontWeight: FontWeight.bold,
-                                          fontSize: 20),
-                                    ),
-                                    SizedBox(
-                                      width: 6,
-                                    ),
-                                    SvgPicture.asset(
-                                      'icons/arrow_right.svg',
-                                      color: Colors.blue,
-                                      height: 20,
-                                      width: 20,
-                                    ),
-                                  ],
-                                ))
+                            Password(),
+                            SizedBox(
+                              height: 20,
+                            ),
+                            Company(),
                           ],
                         ),
                       ),
-                    ),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.end,
+                        children: [
+                          Padding(
+                            padding: const EdgeInsets.all(12.0),
+                            child: ElevatedButton(
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor: Colors.red,
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(24),
+                                  ),
+                                ),
+                                onPressed: () {
+                                  emailController.clear();
+                                  passController.clear();
+                                },
+                                child: SvgPicture.asset(
+                                  'icons/Reset.svg',
+                                  height: 20,
+                                  width: 20,
+                                  color: Colors.white,
+                                )),
+                          ),
+                        ],
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.all(12.0),
+                        child: GestureDetector(
+                          onTap: () {
+                            //play animation
+                            _btnanimation.isActive = true;
+                            if (_formKey.currentState!.validate()) {
+                              // add data to the cloud firestore
+                              _fireStore.collection('Information').add({
+                                'Email': email,
+                                'Password': password,
+                                'Picture': picture,
+                                'Time': Timestamp.now(),
+                              });
+
+                              // add data locally
+
+                              Provider.of<Data>(context, listen: false)
+                                  .setEmail(email);
+                              Provider.of<Data>(context, listen: false)
+                                  .setPass(password);
+                              Provider.of<Data>(context, listen: false)
+                                  .setPic(picture);
+                              Provider.of<Data>(context, listen: false)
+                                  .addEmail(
+                                      Provider.of<Data>(context, listen: false)
+                                          .email!,
+                                      Provider.of<Data>(context, listen: false)
+                                          .password!,
+                                      Provider.of<Data>(context, listen: false)
+                                          .picture!);
+
+                              emailController.clear();
+                              passController.clear();
+
+                              Navigator.pop(context);
+                            }
+                          },
+                          child: Container(
+                            height: 64,
+                            width: 236,
+                            child: Stack(
+                              children: [
+                                RiveAnimation.asset(
+                                  'assets/submit.riv',
+                                  controllers: [_btnanimation],
+                                ),
+                                Positioned.fill(
+                                    top: 4,
+                                    child: Row(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.center,
+                                      children: [
+                                        Text(
+                                          'Submit',
+                                          style: TextStyle(
+                                              fontWeight: FontWeight.bold,
+                                              fontSize: 20),
+                                        ),
+                                        SizedBox(
+                                          width: 6,
+                                        ),
+                                        SvgPicture.asset(
+                                          'icons/arrow_right.svg',
+                                          color: Colors.blue,
+                                          height: 20,
+                                          width: 20,
+                                        ),
+                                      ],
+                                    ))
+                              ],
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
                   ),
+                  CloseButton(),
                 ],
               ),
-              CloseButton(),
-            ],
+            ),
           ),
         ),
-      ),
+      ],
     );
   }
 
@@ -214,7 +218,7 @@ class _GeneralDialState extends State<GeneralDial>
       child: TextFormField(
         validator: (value) {
           if (value!.isEmpty) {
-            return "";
+            return "Field can not be empty";
           }
           return null;
         },
@@ -251,7 +255,7 @@ class _GeneralDialState extends State<GeneralDial>
       child: TextFormField(
         validator: (value) {
           if (value!.isEmpty) {
-            return "";
+            return "Field can not be empty";
           }
           return null;
         },

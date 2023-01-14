@@ -44,8 +44,27 @@ class Data extends ChangeNotifier {
     notifyListeners();
   }
 
+  // void removeData(int index) {
+  //   print(emaillist[index].email);
+
+  //   emaillist.removeAt(index);
+  //   print(emaillist[index].email);
+
+  //   if (filteredList.length != 0) {
+  //     filteredList.removeAt(index);
+  //   }
+  //   notifyListeners();
+  // }
+
   void addSearch(final data) {
     filteredList = data;
+    notifyListeners();
+  }
+
+  void emptySearch() {
+    if (filteredList.length != 0) {
+      filteredList.removeRange(0, filteredList.length);
+    }
     notifyListeners();
   }
 
